@@ -1,0 +1,30 @@
+# WOMBAT: Univariate GWAS, consider two SNPs simultaneously
+ANAL UNI
+
+DATA wombat.dat
+  animal   1000
+  PE       1000
+  dom      1000
+  breed   4
+  cage    24
+  FEW
+  snp
+  znp
+end
+
+MODEL
+  FIX breed
+  FIX cage
+# fit SNP effects as linear covariables (before other covariables!)
+  SUBJ animal
+  RAN animal  GIN
+  RAN dom GIN
+  trait  FEW
+END MOD
+
+VAR animal 1
+5.72
+VAR dom 1
+1
+VAR residual 1
+10.47
