@@ -45,7 +45,7 @@ MR Analysis: Statistical models used for causal inference.
 Sensitivity Analysis: Testing robustness of MR findings.
 Output: Summary of MR results and their interpretation.
 
-Markdown file outlining steps taken to call variants from WGS data is here 
+Markdown file outlining steps taken to call variants from WGS data is here [here 1_genotype_calling](1_genotype_calling/genotype_calling.md)
 
 Markdown file outlining steps taken to do genome-wide assocation study with additive and additive-dominance model is here 
 
