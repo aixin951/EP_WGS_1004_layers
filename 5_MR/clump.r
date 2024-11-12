@@ -1,0 +1,6 @@
+library(dplyr)
+library(data.table)
+clum <- fread("/lustre/nobackup/WUR/ABGC/ni010/seq/9_MR/clump_pre.dat",header=T)
+eqtl <- read.table("eqtl_raw.dat",header=T)
+clum_dat <- left_join(eqtl,clum,by="snpid")
+write.table(clum_dat,"clum_dat.dat",row.names=FALSE,quote=FALSE)
