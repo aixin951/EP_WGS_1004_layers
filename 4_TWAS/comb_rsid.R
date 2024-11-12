@@ -1,0 +1,11 @@
+````R
+library(data.table)
+library(dplyr)
+pvalue_add <- fread("add_twas_changebeta", header=T)
+rsid <- fread("chicken7w_dbSNP_ref.dat",header=T)
+com_add <- inner_join(rsid,pvalue_add,by="snpid")
+write.table(com_add,"com_add_changebeta.dat",row.names=FALSE)
+pvalue_dom <- fread("dom_twas_changebeta", header=T)
+com_dom <- inner_join(rsid,pvalue_dom,by="snpid")
+write.table(com_dom,"com_dom_changebeta.dat",row.names=FALSE)
+````
