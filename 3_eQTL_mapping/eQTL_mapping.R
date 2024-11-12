@@ -1,4 +1,3 @@
-````R
 #!/usr/bin/env Rscrip/lustre/nobackup/WUR/ABGC/ni010/seq/6_eQTL/9_eQTL/eqtl_mappingt
 library(MatrixEQTL) 
 
@@ -77,4 +76,3 @@ me = Matrix_eQTL_main(
   pvalue.hist = "qqplot",
   min.pv.by.genesnp = FALSE,
   noFDRsaveMemory = FALSE);
-````
