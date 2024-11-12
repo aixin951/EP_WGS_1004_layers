@@ -35,7 +35,6 @@ write.table(data1,"free_final_reAn_reHom_imput_ref_SNPCounts_add_dom_1.dat",row.
 
 Additive model (Model A)
 
-
 ```bash
 trait=(CEN200 CEN300 CEN400 CEN500 CEN600 CEN700 EN300 EN400 EN500 EN600 EN700 EN300_500 EN500_700)
 i=6
@@ -219,6 +218,30 @@ done
 
 #### plot the mahattan plot
 
+Additive model (Model A)
+```bash
+trait=(CEN200 CEN300 CEN400 CEN500 CEN600 CEN700 EN300 EN400 EN500 EN600 EN700 EN300_500 EN500_700)
+j=0
+while(($j<=12))
+do
+
+cp *.R ${trait[$j]}
+cd ${trait[$j]}
+awk '$1 !~ /^Z|^W/ {print $2,$1,$4}' /lustre/nobackup/WUR/ABGC/ni010/seq/5_GWAS/4_association/wombat/free_final_reAn_reHom_imput_ref.bim | sed '1i rs chr ps' > pos_raw
+grep -v -wFf freq_YY_WW_id_ZW pos_raw > pos
+awk '{print $1 }' pos | sed '1d' > pos_id
+awk '{print $1,$2,$3}' SNPSolutions.dat | sed -n '1d' | sed '1i Beta SE t_value' > add_t
+paste pos add_t | sed 's/\t/ /g' > add
+snp_number_1=$((2 * $(cat snp_number)))
+sed -i "7c add_p\$p_value = 2*pt(q=abs(add_p\$t_value),df=$snp_number_1,lower.tail=FALSE)" q_m_new_0.01.R
+Rscript q_m_new_0.01.R
+
+cd ..
+let "j++"
+done
+
+
+Additive-dominance model (Model AD)
 ```bash
 trait=(CEN200 CEN300 CEN400 CEN500 CEN600 CEN700 EN300 EN400 EN500 EN600 EN700 EN300_500 EN500_700)
 j=0
