@@ -59,23 +59,6 @@ tabix -p vcf /lustre/nobackup/WUR/ABGC/ni010/seq/4_SNP_calling/chr2.vcf.gz
 
 #### Combine VCF files, transfer to PLINK format, and filter
 
-attach the calc_grm_WW.inp 
-
-```
-12528961
-free_WW.bed PED.txt
-genotypes
-1
-vanraden
-grm
-G ASReml
-print_giv=asc
-print_geno=no
-8
-```
-
-
-
 ```bash
 ##combine VCF files
 module load vcftools plink
