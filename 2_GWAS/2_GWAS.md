@@ -239,7 +239,7 @@ Rscript q_m_new_0.01.R
 cd ..
 let "j++"
 done
-
+```
 
 Additive-dominance model (Model AD)
 ```bash
@@ -265,3 +265,4 @@ Rscript q_m_new_0.01.R
 cd ..
 let "j++"
 done
+```
