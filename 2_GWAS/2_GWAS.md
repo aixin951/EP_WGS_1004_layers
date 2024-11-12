@@ -61,7 +61,7 @@ paste trait_id trait_id | sed 's/\t/ /g' > ${trait[$j]}_id_plink
 module load plink
 plink --bfile free_final_reAn_reHom_imput_ref --allow-extra-chr --chr-set 41 --keep-allele-order --keep ${trait[$j]}_id_plink --make-bed --out ${trait[$j]}
 
-##准备cacl_grm输入的sort过的raw文件
+##prepare calc_grm input
 awk '$1 ~ /^Z|^W/ {print $2}' ${trait[$j]}.bim > WZ_SNP_id
 plink --bfile ${trait[$j]} --allow-extra-chr --chr-set 41 --exclude WZ_SNP_id --keep-allele-order --recode A --out ${trait[$j]}_reWZ
 sort -k 1n ${trait[$j]}_reWZ.raw | cut --complement -d' ' -f1,3,4,5,6 | sed '1d' > reWZ_calc.raw
