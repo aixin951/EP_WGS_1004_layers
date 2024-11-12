@@ -1,4 +1,3 @@
-````R
 cat('-----PrediXcan-R----- \n-----2021-07-27---- \n')
 
 library(optparse)
@@ -608,4 +607,3 @@ if(opt$asso_test){
 
 
 }
-                                     ````
