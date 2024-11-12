@@ -1,3 +1,68 @@
+#### Correct TPM files with breeds and ages
+
+```R
+##Rscript correct age and breed
+# Read the data from the file
+data <- read.table("GE_TPM0_3_transpose.txt", header = TRUE)
+# Extract relevant columns
+IID <- data$geneid
+breed <- data$Breed
+age <- data$Age
+gene_expr <- data[, -(1:3)]  # Exclude columns IID, Breed, Age
+# List to store model results and residuals
+residuals_list <- list()
+# Iterate through each gene expression level
+for (gene_index in 1:ncol(gene_expr)) {
+  gene_name <- colnames(gene_expr)[gene_index]
+  # Fit a linear model with age and breed as fixed effects
+  model <- lm(gene_expr[, gene_index] ~ age + breed)
+  # Extract residuals
+  residuals <- residuals(model)
+  # Store residuals in the list
+  residuals_list[[gene_name]] <- residuals
+}
+# Create a data frame with IID, Breed, Age, and residuals for each gene
+residuals_df <- data.frame(IID = IID, Breed = breed, Age = age)
+for (gene_index in 1:length(residuals_list)) {
+  gene_name <- names(residuals_list)[gene_index]
+  residuals_df[[gene_name]] <- residuals_list[[gene_name]]
+}
+# Save the residuals data frame to a file (e.g., "residuals_data.csv")
+write.table(residuals_df, file = "GE_TPM0_residual_twas.txt", row.names = FALSE,quote=FALSE)
+```
+
+#### TWAS model training
+
+```bash
+module load plink
+main_dir=/lustre/nobackup/WUR/ABGC/ni010/seq/7_TWAS/2_attp_tpmCorrectAgeandBreed
+sub_job=$i
+#step 1. model training
+#ml GCC OpenMPI R
+Rscript \${main_dir}/src/predixcan_r.r \\
+       --model_training \\
+        --main_dir \${main_dir} \\
+        --plink_file_name \${main_dir}/bfile/free_final_reAn_reHom_imput_ref \\
+        --expression_file_name \${main_dir}/expression/GE_TPM0_residual_twas.txt \\
+        --subjob_id \${sub_job} \\
+        --n_genes_for_each_subjob 1000 \\
+        --annotation_file_name \${main_dir}/anno/GRCg7w_110_twas.gft
+# If a '--parallel' flag is added, max(n-1,1) core(s) will be used for parallel model training, where n is the number of available cores.
+
+main_dir=/lustre/nobackup/WUR/ABGC/ni010/seq/7_TWAS/2_attp_tpmCorrectAgeandBreed
+model_name=attp2_correct_TPM0
+Rscript ${main_dir}/src/predixcan_r.r \
+         --generate_db_and_cov \
+         --main_dir ${main_dir} \
+         --plink_file_name ${main_dir}/bfile/free_final_reAn_reHom_imput_ref \
+         --expression_file_name ${main_dir}/expression/GE_TPM0_residual_twas.txt \
+         --annotation_file_name ${main_dir}/anno/GRCg7w_110_twas.gft \
+         --output_file_name ${model_name}
+```
+
+#### TWAS analysis
+
+```bash
 ##Model A
 module load R
 trait=(CEN200 CEN300 CEN400 CEN500 CEN600 CEN700 EN300 EN400 EN500 EN600 EN700 EN300_500 EN500_700)
@@ -79,4 +144,5 @@ Rscript /lustre/nobackup/WUR/ABGC/ni010/seq/7_TWAS/2_attp_tpmCorrectAgeandBreed/
 cd ..
 let "j++"
 done
-````
+
+```
