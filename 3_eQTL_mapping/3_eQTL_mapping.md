@@ -162,5 +162,5 @@ done
 
 ```bash
 module load R
-Rscript trans.R
+Rscript eQTL_mapping.R
 ````
