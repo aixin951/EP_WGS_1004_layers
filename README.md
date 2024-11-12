@@ -2,7 +2,8 @@
 
 Repo for code used in paper
 
-###Overview
+### Overview
+
 This document provides step-by-step guidance on key analyses, including variant calling, GWAS, eQTL mapping, transcriptome-wide association studies, and Mendelian randomization. 
 
 1. Variant Calling from Whole Genome Sequencing (WGS)
@@ -54,10 +55,10 @@ Markdown file outlining steps taken to do transcrioptome-wide association study 
 
 Markdown file outlining steps taken to do Mendelian randomization analysis is here  
 
-####Contact
+#### Contact
 Contact information for author questions or feedback.
 
-######Aixin Ni
+###### Aixin Ni
 
 naixin951@163.com
 [https://orcid.org/0000-0002-4478-915X](https://orcid.org/my-orcid?orcid=0009-0002-7938-1231)
