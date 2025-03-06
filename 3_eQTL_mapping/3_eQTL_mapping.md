@@ -12,43 +12,43 @@ done
 ##data cleanup
 for name in $(cat id); do
 java -Xmx32g -jar /home/jwyuan/software/picard-tools-1.119/SortSam.jar \
-INPUT=/home/jwyuan/nax/chapter2/eQTL/out/${name}Aligned.out.bam \
-OUTPUT=/home/jwyuan/nax/chapter2/eQTL/sort_bam/${name}.sort.bam \
+INPUT=chapter2/eQTL/out/${name}Aligned.out.bam \
+OUTPUT=chapter2/eQTL/sort_bam/${name}.sort.bam \
 SORT_ORDER=coordinate VALIDATION_STRINGENCY=LENIENT \
-TMP_DIR=/home/jwyuan/nax/tmp \
+TMP_DIR=tmp \
 && java -Xmx32g -jar /home/jwyuan/software/picard-tools-1.119/MarkDuplicates.jar \
 MAX_FILE_HANDLES_FOR_READ_ENDS_MAP=1000 \
-INPUT=/home/jwyuan/nax/chapter2/eQTL/sort_bam/${name}.sort.bam \
-OUTPUT=/home/jwyuan/nax/chapter2/eQTL/mark_dup/${name}.sort.dedup.bam \
-METRICS_FILE=/home/jwyuan/nax/chapter2/eQTL/${name}.sort.dedup.metrics \
+INPUT=chapter2/eQTL/sort_bam/${name}.sort.bam \
+OUTPUT=chapter2/eQTL/mark_dup/${name}.sort.dedup.bam \
+METRICS_FILE=chapter2/eQTL/${name}.sort.dedup.metrics \
 VALIDATION_STRINGENCY=LENIENT \
-TMP_DIR=/home/jwyuan/nax/tmp \
+TMP_DIR=tmp \
 && java -Xmx32g -jar /home/jwyuan/software/picard-tools-1.119/ReorderSam.jar \
-I=/home/jwyuan/nax/chapter2/eQTL/mark_dup/${name}.sort.dedup.bam \
-O=/home/jwyuan/nax/chapter2/eQTL/mark_dup_reorder/${name}.sort.dedup.reorder.bam \
-REFERENCE=/home/jwyuan/nax/ref/GRCg7w_dna_toplevel.fa \
+I=chapter2/eQTL/mark_dup/${name}.sort.dedup.bam \
+O=chapter2/eQTL/mark_dup_reorder/${name}.sort.dedup.reorder.bam \
+REFERENCE=ref/GRCg7w_dna_toplevel.fa \
 VALIDATION_STRINGENCY=LENIENT \
-TMP_DIR=/home/jwyuan/nax/tmp \
-&& rm -f /home/jwyuan/nax/chapter2/eQTL/mark_dup/${name}.sort.dedup.bam \
-&& rm -f /home/jwyuan/nax/chapter2/eQTL/${name}.sort.dedup.metrics \
+TMP_DIR=tmp \
+&& rm -f chapter2/eQTL/mark_dup/${name}.sort.dedup.bam \
+&& rm -f chapter2/eQTL/${name}.sort.dedup.metrics \
 &&
 /home/jwyuan/software/samtools-1.12/samtools index \
-/home/jwyuan/nax/chapter2/eQTL/mark_dup_reorder/${name}.sort.dedup.reorder.bam \
+chapter2/eQTL/mark_dup_reorder/${name}.sort.dedup.reorder.bam \
 /home/jwyuan/software/gatk-4.2.2.0/gatk SplitNCigarReads \
--R /home/jwyuan/nax/ref/GRCg7w_dna_toplevel.fa \
--I /home/jwyuan/nax/chapter2/eQTL/mark_dup_reorder/${name}.sort.dedup.reorder.bam \
--O /home/jwyuan/nax/chapter2/eQTL/split/${name}_split.bam
+-R ref/GRCg7w_dna_toplevel.fa \
+-I chapter2/eQTL/mark_dup_reorder/${name}.sort.dedup.reorder.bam \
+-O chapter2/eQTL/split/${name}_split.bam
 
 ##Variants calling
 /home/jwyuan/software/gatk-4.2.2.0/gatk --java-options "-Xmx32G" HaplotypeCaller \
--R /home/jwyuan/nax/ref/GRCg7w_dna_toplevel.fa \
--I /home/jwyuan/nax/chapter2/eQTL/recal_bam/${name}.recal.bam \
+-R ref/GRCg7w_dna_toplevel.fa \
+-I chapter2/eQTL/recal_bam/${name}.recal.bam \
 -ERC GVCF \
--O /home/jwyuan/nax/chapter2/eQTL/raw_vcf/${name}.g.vcf \
+-O chapter2/eQTL/raw_vcf/${name}.g.vcf \
 --standard-min-confidence-threshold-for-calling 20 \
 --create-output-variant-index FALSE \
 
-&& gzip /home/jwyuan/nax/chapter2/eQTL/raw_vcf/${name}.g.vcf
+&& gzip chapter2/eQTL/raw_vcf/${name}.g.vcf
 done
 
 ##combine gVCFs
