@@ -44,7 +44,7 @@ while(($i<=18))&&(($j<=12))&&(($m<=13))
 
 do
 mkdir ${trait[$j]}
-cp /lustre/nobackup/WUR/ABGC/ni010/seq/5_GWAS/4_association/wombat/free_final_reAn_reHom_imput_ref.* ${trait[$j]}
+cp seq/5_GWAS/4_association/wombat/free_final_reAn_reHom_imput_ref.* ${trait[$j]}
 cp calc_grm.inp ${trait[$j]}
 cp trans.R ${trait[$j]}
 cp wombat_1.par ${trait[$j]}
@@ -87,18 +87,18 @@ awk '$3=="NA" {print FNR}' com_id > abs_id
 tr '\n' ' ' <  abs_id > abs_id_t
 sed -e '$a\' abs_id_t | sed 's/\s*$//g' | sed 's/ /,/g' > abs_id_t_2
 remo=$(cat abs_id_t_2)
-cut -b $remo --complement /lustre/nobackup/WUR/ABGC/ni010/seq/5_GWAS/4_association/wombat/SNPCounts_add_new.dat > SNPCounts.dat
+cut -b $remo --complement seq/5_GWAS/4_association/wombat/SNPCounts_add_new.dat > SNPCounts.dat
 
 var=$(cat var)
 sed -i "24c $var" wombat_1.par
 sed -i "26c $var" wombat_1.par
-/lustre/nobackup/WUR/ABGC/ni010/Software/wombat/wombat --dense --threads8 wombat_1.par
+Software/wombat/wombat --dense --threads8 wombat_1.par
 
 animal=$(grep "2  COVS" SumEstimates.out | awk -F ' ' '{print $6}')
 re=$(grep "1  COVS" SumEstimates.out | awk -F ' ' '{print $6}')
 sed -i "26c $animal" wombat_2.par
 sed -i "28c $re" wombat_2.par
-/lustre/nobackup/WUR/ABGC/ni010/Software/wombat/wombat --snap --dense --threads8 wombat_2.par
+Software/wombat/wombat --snap --dense --threads8 wombat_2.par
 let "i++"
 let "j++"
 let "m++"
@@ -115,9 +115,9 @@ m=1
 while(($i<=18))&&(($j<=12))&&(($m<=13))
 do
 mkdir ${trait[$j]}
-cp /lustre/nobackup/WUR/ABGC/ni010/seq/5_GWAS/4_association/wombat/free_final_reAn_reHom_imput_ref.* ${trait[$j]}
-cp /lustre/nobackup/WUR/ABGC/ni010/seq/5_GWAS/4_association/wombat/calc_grm.inp ${trait[$j]}
-cp /lustre/nobackup/WUR/ABGC/ni010/seq/5_GWAS/4_association/wombat/id_933_sort ${trait[$j]}
+cp seq/5_GWAS/4_association/wombat/free_final_reAn_reHom_imput_ref.* ${trait[$j]}
+cp seq/5_GWAS/4_association/wombat/calc_grm.inp ${trait[$j]}
+cp seq/5_GWAS/4_association/wombat/id_933_sort ${trait[$j]}
 cp trans.R ${trait[$j]}
 cp wombat_1.par ${trait[$j]}
 cp wombat_2.par ${trait[$j]}
@@ -185,8 +185,8 @@ awk '{print $2,$1,$3}' D_asreml.giv > tmp
 cat deter_D tmp > dom.gin
 rm tmp
 
-awk 'FNR==NR{a[$0]++};FNR!=NR{if($2 in a){print}}' freq_YY_WW_id_ZW /lustre/nobackup/WUR/ABGC/ni010/seq/5_GWAS/4_association/wombat/snpid_add_dom_transpose_rmWZ_new | awk '{print $1}' > line_number
-awk 'NR==FNR{l[$0];next;} !(FNR in l)' line_number /lustre/nobackup/WUR/ABGC/ni010/seq/5_GWAS/4_association/wombat/SNPCounts_add_dom_new_rmWZ.dat > SNPCounts_rmSNP.dat
+awk 'FNR==NR{a[$0]++};FNR!=NR{if($2 in a){print}}' freq_YY_WW_id_ZW seq/5_GWAS/4_association/wombat/snpid_add_dom_transpose_rmWZ_new | awk '{print $1}' > line_number
+awk 'NR==FNR{l[$0];next;} !(FNR in l)' line_number seq/5_GWAS/4_association/wombat/SNPCounts_add_dom_new_rmWZ.dat > SNPCounts_rmSNP.dat
 awk '$3=="NA" {print FNR}' com_id > abs_id
 tr '\n' ' ' <  abs_id > abs_id_t
 sed -e '$a\' abs_id_t | sed 's/\s*$//g' | sed 's/ /,/g' > abs_id_t_2
@@ -199,7 +199,7 @@ sed -i "26c $var" wombat_1.par
 sed -i "28c $var_dom" wombat_1.par
 sed -i "30c $var" wombat_1.par
 
-echo -ne '\n' | /lustre/nobackup/WUR/ABGC/ni010/Software/wombat/wombat --dense --threads8 wombat_1.par
+echo -ne '\n' | Software/wombat/wombat --dense --threads8 wombat_1.par
 
 animal=$(grep "2  COVS" SumEstimates.out | awk -F ' ' '{print $6}')
 dom=$(grep "3  COVS" SumEstimates.out | awk -F ' ' '{print $6}')
@@ -208,7 +208,7 @@ sed -i "29c $animal" wombat_2.par
 sed -i "31c $dom" wombat_2.par
 sed -i "33c $re" wombat_2.par
 
-echo -ne '\n' | /lustre/nobackup/WUR/ABGC/ni010/Software/wombat/wombat --snap --dense --threads8 wombat_2.par" > ${trait[$j]}.sh
+echo -ne '\n' | Software/wombat/wombat --snap --dense --threads8 wombat_2.par" > ${trait[$j]}.sh
 
 let "i++"
 let "j++"
@@ -227,7 +227,7 @@ do
 
 cp *.R ${trait[$j]}
 cd ${trait[$j]}
-awk '$1 !~ /^Z|^W/ {print $2,$1,$4}' /lustre/nobackup/WUR/ABGC/ni010/seq/5_GWAS/4_association/wombat/free_final_reAn_reHom_imput_ref.bim | sed '1i rs chr ps' > pos_raw
+awk '$1 !~ /^Z|^W/ {print $2,$1,$4}' seq/5_GWAS/4_association/wombat/free_final_reAn_reHom_imput_ref.bim | sed '1i rs chr ps' > pos_raw
 grep -v -wFf freq_YY_WW_id_ZW pos_raw > pos
 awk '{print $1 }' pos | sed '1d' > pos_id
 awk '{print $1,$2,$3}' SNPSolutions.dat | sed -n '1d' | sed '1i Beta SE t_value' > add_t
@@ -250,7 +250,7 @@ do
 
 cp *.R ${trait[$j]}
 cd ${trait[$j]}
-awk '$1 !~ /^Z|^W/ {print $2,$1,$4}' /lustre/nobackup/WUR/ABGC/ni010/seq/5_GWAS/4_association/wombat/free_final_reAn_reHom_imput_ref.bim | sed '1i rs chr ps' > pos_raw
+awk '$1 !~ /^Z|^W/ {print $2,$1,$4}' seq/5_GWAS/4_association/wombat/free_final_reAn_reHom_imput_ref.bim | sed '1i rs chr ps' > pos_raw
 grep -v -wFf freq_YY_WW_id_ZW pos_raw > pos
 awk '{print $1 }' pos | sed '1d' > pos_id
 awk '{print $1,$2,$3}' SNPSolutions.dat | sed -n '1~2p' | sed '1i Beta SE t_value' > add_t
