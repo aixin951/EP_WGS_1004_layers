@@ -2,10 +2,10 @@
 
 ```bash
 ##get the index file for reference genome
-#/lustre/nobackup/WUR/ABGC/ni010/Software/STAR/STAR-2.7.11a/bin/Linux_x86_64/STAR --runThreadN 32 --runMode genomeGenerate --genomeSAindexNbases 13 --genomeDir /lustre/nobackup/WUR/ABGC/ni010/seq/6_eQTL/index --sjdbGTFfile /lustre/nobackup/WUR/ABGC/ni010/seq/ref/GRCg7w.109.chr.gtf --genomeFastaFiles /lustre/nobackup/WUR/ABGC/ni010/seq/ref/GRCg7w.dna.toplevel.fa --sjdbOverhang 100
+#Software/STAR/STAR-2.7.11a/bin/Linux_x86_64/STAR --runThreadN 32 --runMode genomeGenerate --genomeSAindexNbases 13 --genomeDir seq/6_eQTL/index --sjdbGTFfile seq/ref/GRCg7w.109.chr.gtf --genomeFastaFiles seq/ref/GRCg7w.dna.toplevel.fa --sjdbOverhang 100
 ##mapping to reference genome
 for i in $(cat id); do
-/lustre/nobackup/WUR/ABGC/ni010/Software/STAR/STAR-2.7.11a/bin/Linux_x86_64/STAR --runThreadN 32 --genomeDir /lustre/nobackup/WUR/ABGC/ni010/seq/6_eQTL/index --readFilesCommand gunzip -c --readFilesIn /lustre/nobackup/WUR/ABGC/ni010/seq/6_eQTL/raw_data/${i}_1.fq.gz /lustre/nobackup/WUR/ABGC/ni010/seq/6_eQTL/raw_data/${i}_2.fq.gz --sjdbGTFfile /lustre/nobackup/WUR/ABGC/ni010/seq/ref/GRCg7w.109.chr.gtf --outSAMtype BAM Unsorted --outFileNamePrefix /lustre/nobackup/WUR/ABGC/ni010/seq/6_eQTL/1_mapping/${i}/${i} --limitSjdbInsertNsj 2000000 --outSAMattrRGline ID:3YW3 SM:ov PL:ILLUMINA
+Software/STAR/STAR-2.7.11a/bin/Linux_x86_64/STAR --runThreadN 32 --genomeDir seq/6_eQTL/index --readFilesCommand gunzip -c --readFilesIn seq/6_eQTL/raw_data/${i}_1.fq.gz seq/6_eQTL/raw_data/${i}_2.fq.gz --sjdbGTFfile seq/ref/GRCg7w.109.chr.gtf --outSAMtype BAM Unsorted --outFileNamePrefix seq/6_eQTL/1_mapping/${i}/${i} --limitSjdbInsertNsj 2000000 --outSAMattrRGline ID:3YW3 SM:ov PL:ILLUMINA
 done
 
 
@@ -52,19 +52,19 @@ TMP_DIR=/home/jwyuan/nax/tmp \
 done
 
 ##combine gVCFs
-gatk CombineGVCFs -R /lustre/nobackup/WUR/ABGC/ni010/seq/ref/GRCg7w.dna.toplevel.fa --variant *.g.vcf -O /lustre/nobackup/WUR/ABGC/ni010/seq/6_eQTL/6_raw_vcf/rna.g.vcf
+gatk CombineGVCFs -R seq/ref/GRCg7w.dna.toplevel.fa --variant *.g.vcf -O seq/6_eQTL/6_raw_vcf/rna.g.vcf
 
 #variants calling
-gatk GenotypeGVCFs -R /lustre/nobackup/WUR/ABGC/ni010/seq/ref/GRCg7w.dna.toplevel.fa -V rna.g.vcf -O rna_raw.vcf
+gatk GenotypeGVCFs -R seq/ref/GRCg7w.dna.toplevel.fa -V rna.g.vcf -O rna_raw.vcf
 
 #extract SNPs
-gatk SelectVariants -R /lustre/nobackup/WUR/ABGC/ni010/seq/ref/GRCg7w.dna.toplevel.fa -V rna_raw.vcf --select-type SNP -O rna_snp.vcf
+gatk SelectVariants -R seq/ref/GRCg7w.dna.toplevel.fa -V rna_raw.vcf --select-type SNP -O rna_snp.vcf
 
 #filter SNPs
-gatk VariantFiltration -R /lustre/nobackup/WUR/ABGC/ni010/seq/ref/GRCg7w.dna.toplevel.fa -V rna_snp.vcf --filter-expression "QD < 2.0 || MQ < 40.0 || FS > 60.0 || SOR > 3.0 || MQRankSum < -12.5 || ReadPosRankSum < -8.0" --filter-name 'SNP_filter' -O rna_filter_snp.vcf
+gatk VariantFiltration -R seq/ref/GRCg7w.dna.toplevel.fa -V rna_snp.vcf --filter-expression "QD < 2.0 || MQ < 40.0 || FS > 60.0 || SOR > 3.0 || MQRankSum < -12.5 || ReadPosRankSum < -8.0" --filter-name 'SNP_filter' -O rna_filter_snp.vcf
 
 #extract filtered SNPs
-gatk SelectVariants  -R /lustre/nobackup/WUR/ABGC/ni010/seq/ref/GRCg7w.dna.toplevel.fa -V rna_filter_snp.vcf --exclude-filtered  -O rna_filtered_snp.vcf
+gatk SelectVariants  -R seq/ref/GRCg7w.dna.toplevel.fa -V rna_filter_snp.vcf --exclude-filtered  -O rna_filtered_snp.vcf
 
 ##transfer to PLINK format
 module load plink/2.0 beagle
@@ -82,8 +82,8 @@ sort snpid_remove | unique > snpid_remove_1
 plink --bfile rna_snpid_raw --allow-extra-chr --chr-set 41 --keep-allele-order --exclude snpid_remove_1 --make-bed --out rna_snpid
 
 ##impute with beagle
-plink2 --bfile /lustre/nobackup/WUR/ABGC/ni010/seq/6_eQTL/6_raw_vcf/rna_snpid_ref --keep-allele-order --allow-extra-chr --chr-set 41 --recode vcf-iid --chr $i --out chr$i
-plink2 --bfile /lustre/nobackup/WUR/ABGC/ni010/seq/5_GWAS/4_association/wombat/free_final_reAn_reHom_imput_ref --keep-allele-order --allow-extra-chr --chr-set 41 --recode vcf-iid --chr $i --out ref_chr$i
+plink2 --bfile seq/6_eQTL/6_raw_vcf/rna_snpid_ref --keep-allele-order --allow-extra-chr --chr-set 41 --recode vcf-iid --chr $i --out chr$i
+plink2 --bfile seq/5_GWAS/4_association/wombat/free_final_reAn_reHom_imput_ref --keep-allele-order --allow-extra-chr --chr-set 41 --recode vcf-iid --chr $i --out ref_chr$i
 sed 's/[/]/|/g' ref_chr$i.vcf > ref_chr${i}_phased.vcf
 java -Xmx50g -Xss5m -jar beagle.jar gt=chr$i.vcf ref=ref_chr${i}_phased.vcf out=chr${i}_impu nthreads=8
 
@@ -93,7 +93,7 @@ ls */*.vcf.gz  | xargs vcf-concat > rna_imput.vcf
 module load plink
 plink --vcf rna_imput.vcf --allow-extra-chr --chr-set 41 --make-bed --keep-allele-order --out rna_imput
 plink --bfile rna_imput --allow-extra-chr --chr-set 41 --keep id_ovary_plink --keep-allele-order --make-bed --out rna_ovary_imput
-plink --bfile /lustre/nobackup/WUR/ABGC/ni010/seq/5_GWAS/4_association/wombat/free_final_reAn_reHom_imput_ref --allow-extra-chr --chr-set 41 --keep id_ovary_noimput --make-bed --keep-allele-order --out rna_ovary_noimput
+plink --bfile seq/5_GWAS/4_association/wombat/free_final_reAn_reHom_imput_ref --allow-extra-chr --chr-set 41 --keep id_ovary_noimput --make-bed --keep-allele-order --out rna_ovary_noimput
 plink --bfile rna_ovary_imput --bmerge rna_ovary_noimput --chr-set 41 --keep-allele-order --allow-extra-chr --nonfounders --make-bed --out rna_ovary
 plink --bfile rna_ovary --chr-set 41 --allow-extra-chr --nonfounders --keep-allele-order --maf 0.05 --make-bed --out rna_ovary_maf
 plink --bfile rna_ovary_maf --chr-set 41 --allow-extra-chr --keep-allele-order --make-bed --update-ids change_ids --out rna_ovary_maf_changeid
@@ -119,40 +119,40 @@ while (($i<=5))
 do
 mkdir ${trait[$i]}
 hisat2 -p 16 --dta --rna-strandness RF \
--x /lustre/nobackup/WUR/ABGC/ni010/seq/ref/index/GRCg7w \
--1 /lustre/nobackup/WUR/ABGC/ni010/seq/6_eQTL/raw_data/${trait[$i]}_1.fq.gz \
--2 /lustre/nobackup/WUR/ABGC/ni010/seq/6_eQTL/raw_data/${trait[$i]}_2.fq.gz \
--S /lustre/nobackup/WUR/ABGC/ni010/seq/6_eQTL/8_fpkm/${trait[$i]}/${trait[$i]}.sam \
---summary-file /lustre/nobackup/WUR/ABGC/ni010/seq/6_eQTL/8_fpkm/${trait[$i]}/${trait[$i]}.summary \
---met-file /lustre/nobackup/WUR/ABGC/ni010/seq/6_eQTL/8_fpkm/${trait[$i]}/${trait[$i]}.metrics \
+-x seq/ref/index/GRCg7w \
+-1 seq/6_eQTL/raw_data/${trait[$i]}_1.fq.gz \
+-2 seq/6_eQTL/raw_data/${trait[$i]}_2.fq.gz \
+-S seq/6_eQTL/8_fpkm/${trait[$i]}/${trait[$i]}.sam \
+--summary-file seq/6_eQTL/8_fpkm/${trait[$i]}/${trait[$i]}.summary \
+--met-file seq/6_eQTL/8_fpkm/${trait[$i]}/${trait[$i]}.metrics \
 #&& rm /home/jwyuan/jyuan/output/1fe/${trait[$i]}.sam
 
 #####sequence summary
-awk '{print $2,$3}' /lustre/nobackup/WUR/ABGC/ni010/seq/6_eQTL/8_fpkm/${trait[$i]}/${trait[$i]}.metrics > /lustre/nobackup/WUR/ABGC/ni010/seq/6_eQTL/8_fpkm/QC/${trait[$i]}_seq.txt
+awk '{print $2,$3}' seq/6_eQTL/8_fpkm/${trait[$i]}/${trait[$i]}.metrics > seq/6_eQTL/8_fpkm/QC/${trait[$i]}_seq.txt
 #awk -v OFS='\t' 'NR==1{print "file", $0};FNR==2{print FILENAME, $0}' *.txt | sed -i 's/.txt/ /g' out.txt
 
 ######mapping summary
-tail -2 /lustre/nobackup/WUR/ABGC/ni010/seq/6_eQTL/8_fpkm/${trait[$i]}/${trait[$i]}.summary > /lustre/nobackup/WUR/ABGC/ni010/seq/6_eQTL/8_fpkm/QC/${trait[$i]}_mapping.txt
+tail -2 seq/6_eQTL/8_fpkm/${trait[$i]}/${trait[$i]}.summary > seq/6_eQTL/8_fpkm/QC/${trait[$i]}_mapping.txt
 #awk -v OFS='\t' 'NR==1{print "file", $0};FNR==2{print FILENAME, $0}' *.txt > out &&  sed -i 's/.txt/ /g' out && awk '{print $1,$2}' out > mapping.txt && rm -rf out
 module load samtools
 samtools sort -@ 16 \
--o /lustre/nobackup/WUR/ABGC/ni010/seq/6_eQTL/8_fpkm/${trait[$i]}/${trait[$i]}.bam \
-/lustre/nobackup/WUR/ABGC/ni010/seq/6_eQTL/8_fpkm/${trait[$i]}/${trait[$i]}.sam
+-o seq/6_eQTL/8_fpkm/${trait[$i]}/${trait[$i]}.bam \
+seq/6_eQTL/8_fpkm/${trait[$i]}/${trait[$i]}.sam
 
 #========gene counts================
 featureCounts \
--a /lustre/nobackup/WUR/ABGC/ni010/seq/ref/GRCg7w.109.chr.gtf \
+-a seq/ref/GRCg7w.109.chr.gtf \
 -T 6 --countReadPairs -p -g gene_id -t exon \
--o /lustre/nobackup/WUR/ABGC/ni010/seq/6_eQTL/8_fpkm/${trait[$i]}/${trait[$i]}.counts.txt \
-/lustre/nobackup/WUR/ABGC/ni010/seq/6_eQTL/8_fpkm/${trait[$i]}/${trait[$i]}.bam
+-o seq/6_eQTL/8_fpkm/${trait[$i]}/${trait[$i]}.counts.txt \
+seq/6_eQTL/8_fpkm/${trait[$i]}/${trait[$i]}.bam
 
 #==========gene fpkm===========#
-mkdir /lustre/nobackup/WUR/ABGC/ni010/seq/6_eQTL/8_fpkm/gene/${trait[$i]}
+mkdir seq/6_eQTL/8_fpkm/gene/${trait[$i]}
 stringtie -p 32 -e -B \
--A //lustre/nobackup/WUR/ABGC/ni010/seq/6_eQTL/8_fpkm/gene/${trait[$i]}/${trait[$i]}.tab \
--G /lustre/nobackup/WUR/ABGC/ni010/seq/ref/GRCg7w.109.chr.gtf \
--o /lustre/nobackup/WUR/ABGC/ni010/seq/6_eQTL/8_fpkm/${trait[$i]}/${trait[$i]}.gtf \
-/lustre/nobackup/WUR/ABGC/ni010/seq/6_eQTL/8_fpkm/${trait[$i]}/${trait[$i]}.bam
+-A /seq/6_eQTL/8_fpkm/gene/${trait[$i]}/${trait[$i]}.tab \
+-G seq/ref/GRCg7w.109.chr.gtf \
+-o seq/6_eQTL/8_fpkm/${trait[$i]}/${trait[$i]}.gtf \
+seq/6_eQTL/8_fpkm/${trait[$i]}/${trait[$i]}.bam
 
 let "i++"
 done
