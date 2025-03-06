@@ -157,6 +157,44 @@ stringtie -p 32 -e -B \
 let "i++"
 done
 ```
+#### Estimate PEERs effects
+
+```R
+library("peer")
+library("preprocessCore")
+TPM_tmp0<-read.table("seq/6_eQTL/9_eQTL/data/GE.txt",header=T)
+row.names(TPM_tmp0)<-TPM_tmp0$gene_id
+TPM_tmp0<-TPM_tmp0[,-1]
+expr_matrix00<-TPM_tmp0
+expr_matrix00_qn<-normalize.quantiles(as.matrix(TPM_tmp0))
+covs = read.table("seq/EP_revise/peer/Cov.txt",header=T,row.names = 1)
+covs_1<-apply(t(covs),2,as.double)
+
+INT<-function(x){
+  qnorm((rank(x,na.last="keep")-0.5)/sum(!is.na(x)))}
+expr_matrix00_qn_ind<-t(apply(expr_matrix00_qn,MARGIN=1,FUN=INT))
+colnames(expr_matrix00_qn_ind)<-colnames(expr_matrix00)
+rownames(expr_matrix00_qn_ind)<-rownames(expr_matrix00)
+expr_peer<-expr_matrix00_qn_ind
+expr_matrix00_qn_ind<-as.data.frame(expr_matrix00_qn_ind)
+expr_matrix00_qn_ind$id<-row.names(expr_matrix00)
+model=PEER()
+PEER_setPhenoMean(model,as.matrix(t(expr_peer)))
+PEER_setCovariates(model, as.matrix(covs_1))
+dim(PEER_getPhenoMean(model))
+PEER_setNk(model,30)
+PEER_setNmax_iterations(model,1000)
+PEER_getNk(model)
+PEER_update(model)
+factors=PEER_getX(model)
+factors
+Alpha = PEER_getAlpha(model)
+pdf(paste0(30,".r_demo_covs.pdf"),width=8,height=8)
+plot(1.0 / Alpha,xlab="Factors", ylab="Factor relevance", main="")
+dev.off()
+write.table(factors,"120.peer.covariance.txt",sep="\t",row.names=T,quote =FALSE)
+write.table(expr_matrix00_qn_ind,"120.expression.qn_ind.txt",sep="\t",row.names=T,quote =FALSE)
+````
 
 #### eQTL-mapping analysis
 
